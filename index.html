@@ -325,6 +325,11 @@ body.touch #topbar{transform:translateX(-50%) scale(.82);transform-origin:top ce
 @keyframes kfl{0%{opacity:1}100%{opacity:0}}
 #hitmarker.kill{transform:scale(1.6) rotate(0deg) !important}
 #hitmarker.kill i{width:4px;height:16px;top:-8px;background:#ff3b4a;box-shadow:0 0 6px rgba(255,40,60,.8),0 0 0 1px rgba(0,0,0,.5)}
+.cards.locker{grid-template-columns:repeat(2,1fr)}
+.cards.locker button{min-height:60px}
+.cards.locker button b{font-size:16px}
+.cards.locker button.locked{opacity:.45}
+.cards.locker button.locked b::after{content:" 🔒";font-size:12px}
 #confetti{position:absolute;inset:0;z-index:70;pointer-events:none}
 #hitmarker.sh i{background:#6cc8ff}
 .dn.sh{color:#7fd0ff}
@@ -555,6 +560,7 @@ body.touch #topbar{transform:translateX(-50%) scale(.82);transform-origin:top ce
       <nav class="tabs" role="tablist" aria-label="Menu">
         <button data-tab="play" aria-selected="true">Play</button>
         <button data-tab="loadout" aria-selected="false">Loadout</button>
+        <button data-tab="locker" aria-selected="false">Locker</button>
         <button data-tab="challenges" aria-selected="false">Challenges</button>
       </nav>
       <div class="mright"><div id="lvl" class="lvl"></div><button class="iconbtn" id="btnControls" aria-label="Controls">?</button><button class="iconbtn" id="btnSettings" aria-label="Settings">⚙</button></div>
@@ -590,6 +596,12 @@ body.touch #topbar{transform:translateX(-50%) scale(.82);transform-origin:top ce
       <div class="camorow" id="camoRow"></div>
       <h2>Secondary</h2>
       <div class="seg" id="secSeg"></div>
+    </section>
+    <section class="mpanel hidden" data-panel="locker">
+      <h2>Outfit</h2><div class="cards locker" id="cos-outfit"></div>
+      <h2>Headgear</h2><div class="cards locker" id="cos-head"></div>
+      <h2>Backpack</h2><div class="cards locker" id="cos-pack"></div>
+      <p class="hint" style="margin-top:14px">Level up to unlock more. Everyone sees your look online.</p>
     </section>
     <section class="mpanel hidden" data-panel="challenges">
       <div id="chpanel" class="chpanel"></div>
@@ -2941,9 +2953,12 @@ const PLAYER_COLORS = [
 
 const Settings = {
   d: { sens: 1, ads: 0.8, fov: 82, invert: false, master: 0.8, sfx: 1, music: 0.45, quality: 'high', fps: false,
-       name: '', color: -1, primary: 'ar', diff: 'normal' },
+       name: '', color: -1, primary: 'ar', diff: 'normal', cos: { outfit: 'standard', head: 'helmet', pack: 'standard' } },
   load() { try { const s = localStorage.getItem('tidebreak.v1'); if (s) Object.assign(this.d, JSON.parse(s)); } catch (e) {} },
-  save() { try { localStorage.setItem('tidebreak.v1', JSON.stringify(this.d)); } catch (e) {} }
+  save() {
+    let json = ''; try { json = JSON.stringify(this.d); localStorage.setItem('tidebreak.v1', json); } catch (e) {}
+    if (json) { try { Platform.cloudSave(json); } catch (e) {} }   // Platform may not exist yet during startup
+  }
 };
 Settings.load();
 if (Settings.d.color < 0) Settings.d.color = randi(0, PLAYER_COLORS.length - 1);
@@ -4128,65 +4143,151 @@ function makeNameTag(text, hex) {
   s.scale.set(1.5, 0.375, 1); s.renderOrder = 5;
   return s;
 }
-function buildCharacter(hex, weaponId, name) {
+/* ============================================================
+   Cosmetics: outfits, headgear and backpacks (unlocked by level)
+   ============================================================ */
+const OUTFITS = {
+  standard: { name: 'Standard Issue', lv: 1, P: 0x2b3550, Pd: 0x222a40, BT: 0x4a3426, V: 0x3d4a66, D: 0x1a2238 },
+  desert:   { name: 'Desert Ops', lv: 2, P: 0xc2a878, Pd: 0xa68c5e, BT: 0x6b5236, V: 0x9c8a62, D: 0x5a4a32 },
+  arctic:   { name: 'Arctic', lv: 4, P: 0xe8eef4, Pd: 0xc8d2dc, BT: 0x8a96a6, V: 0xdfe6ee, D: 0x6a7686, shirt: 0xf4f7fa },
+  navy:     { name: 'Navy Raider', lv: 6, P: 0x1c2a44, Pd: 0x142036, BT: 0x111826, V: 0x24344f, D: 0x0e1422, armor: true },
+  stealth:  { name: 'Stealth', lv: 9, P: 0x1a1c22, Pd: 0x121418, BT: 0x0c0d10, V: 0x23262e, D: 0x0a0b0e, shirt: 0x22252c, glow: true },
+  gold:     { name: 'Golden Legend', lv: 15, P: 0xb8862b, Pd: 0x8f6620, BT: 0x5e4214, V: 0xe0b13e, D: 0x6b4c16, shirt: 0xf2c94c, armor: true }
+};
+const HEADGEAR = {
+  helmet:     { name: 'Combat Helmet', lv: 1 },
+  cap:        { name: 'Ball Cap', lv: 1 },
+  beanie:     { name: 'Beanie', lv: 2 },
+  bandana:    { name: 'Bandana', lv: 3 },
+  headphones: { name: 'Headphones', lv: 5 },
+  nvg:        { name: 'Night Vision', lv: 7 },
+  crown:      { name: 'Crown', lv: 12 }
+};
+const BACKPACKS = {
+  standard: { name: 'Field Pack', lv: 1 },
+  none:     { name: 'No Backpack', lv: 1 },
+  radio:    { name: 'Radio Pack', lv: 3 },
+  tank:     { name: 'Air Tanks', lv: 5 },
+  jetpack:  { name: 'Jetpack', lv: 8 },
+  wings:    { name: 'Glider Fins', lv: 11 }
+};
+const COSMETIC_SLOTS = { outfit: OUTFITS, head: HEADGEAR, pack: BACKPACKS };
+const DEFAULT_COS = { outfit: 'standard', head: 'helmet', pack: 'standard' };
+function cleanCos(c) {
+  const o = Object.assign({}, DEFAULT_COS);
+  if (c && typeof c === 'object') for (const k in COSMETIC_SLOTS) if (typeof c[k] === 'string' && COSMETIC_SLOTS[k][c[k]]) o[k] = c[k];
+  return o;
+}
+function randomCos() { const o = {}; for (const k in COSMETIC_SLOTS) o[k] = pick(Object.keys(COSMETIC_SLOTS[k])); return o; }
+
+function buildCharacter(hex, weaponId, name, cosIn) {
+  const cos = cleanCos(cosIn), O = OUTFITS[cos.outfit];
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
-  const C = hex, Cd = shade(hex, 0.7), Cl = shade(hex, 1.15), P = 0x2b3550, Pd = 0x222a40, S = 0xffd2ad, D = 0x1a2238, V = 0x3d4a66, W = 0xfff4e0, BT = 0x4a3426;
+  const C = hex, Cd = shade(hex, 0.7), Cl = shade(hex, 1.15), S = 0xffd2ad, W = 0xfff4e0;
+  const P = O.P, Pd = O.Pd, D = O.D, V = O.V, BT = O.BT, SH = O.shirt || C, SHd = O.shirt ? shade(O.shirt, 0.82) : Cd;
   const o = { rough: 0.7 };
+  const neon = { emissive: C, ei: 1.6, shadow: false, keep: true };
   const hips = new THREE.Group(); hips.position.y = 0.88; body.add(hips);
   const legs = [];
   for (const sx of [-1, 1]) {
     const leg = new THREE.Group(); leg.position.set(0.12 * sx, 0, 0); hips.add(leg);
     rb(leg, 0.2, 0.5, 0.22, P, 0, -0.24, 0, o);
     rb(leg, 0.08, 0.14, 0.1, Pd, sx * 0.1, -0.24, 0.0, o);
+    if (O.armor) rb(leg, 0.2, 0.2, 0.06, V, 0, -0.18, -0.12, o);
     const knee = new THREE.Group(); knee.position.y = -0.47; leg.add(knee);
     rb(knee, 0.18, 0.36, 0.2, P, 0, -0.16, 0, o);
     rb(knee, 0.16, 0.13, 0.07, C, 0, -0.02, -0.1, o);
     rb(knee, 0.22, 0.13, 0.31, BT, 0, -0.33, -0.04, o);
     rb(knee, 0.23, 0.04, 0.32, D, 0, -0.39, -0.04, { ...o, r: 0.01 });
     bx(knee, 0.12, 0.012, 0.1, W, 0, -0.27, -0.13, o);
+    if (O.glow) bx(knee, 0.02, 0.3, 0.02, C, sx * 0.09, -0.15, -0.09, neon);
     bakeGroup(knee, 0.75); bakeGroup(leg, 0.75);
     leg.userData.knee = knee; legs.push(leg);
   }
   const torso = new THREE.Group(); hips.add(torso);
-  rb(torso, 0.5, 0.4, 0.3, C, 0, 0.3, 0, o);
-  rb(torso, 0.46, 0.22, 0.28, Cd, 0, 0.06, 0, o);
+  rb(torso, 0.5, 0.4, 0.3, SH, 0, 0.3, 0, o);
+  rb(torso, 0.46, 0.22, 0.28, SHd, 0, 0.06, 0, o);
   rb(torso, 0.53, 0.08, 0.33, D, 0, -0.02, 0, { ...o, r: 0.02 });
   bx(torso, 0.08, 0.06, 0.02, 0xd9a441, 0, -0.02, -0.17, { rough: 0.3, metal: 0.7 });
   for (const sx of [-1, 1]) rb(torso, 0.1, 0.1, 0.08, V, sx * 0.17, -0.02, -0.15, o);
   rb(torso, 0.44, 0.3, 0.06, V, 0, 0.3, -0.16, o);
-  for (const sx of [-1, 0, 1]) rb(torso, 0.11, 0.1, 0.05, Pd, sx * 0.13, 0.26, -0.2, o);
+  if (O.armor) { rb(torso, 0.36, 0.22, 0.05, shade(V, 1.12), 0, 0.32, -0.2, o); for (const sx of [-1, 1]) rb(torso, 0.06, 0.06, 0.03, 0x9aa3b5, sx * 0.13, 0.4, -0.225, { rough: 0.3, metal: 0.8 }); }
+  else for (const sx of [-1, 0, 1]) rb(torso, 0.11, 0.1, 0.05, Pd, sx * 0.13, 0.26, -0.2, o);
   for (const sx of [-1, 1]) bx(torso, 0.06, 0.42, 0.33, V, sx * 0.14, 0.3, 0, o);
-  rb(torso, 0.34, 0.4, 0.17, Pd, 0, 0.28, 0.23, o);
-  rb(torso, 0.3, 0.12, 0.17, C, 0, 0.44, 0.24, o);
-  cyl(torso, 0.07, 0.36, W, 0, 0.12, 0.27, { axis: 'x', rough: 0.8 });
-  cyl(torso, 0.008, 0.4, D, 0.12, 0.6, 0.27, { rough: 0.5 });
-  for (const sx of [-1, 1]) rb(torso, 0.17, 0.12, 0.27, Cl, sx * 0.3, 0.46, 0, o);
-  bakeGroup(torso, 0.72);
-  const tip = bx(torso, 0.02, 0.02, 0.02, 0xff4d5e, 0.12, 0.81, 0.27, { emissive: 0xff4d5e, ei: 3, shadow: false, keep: true });
+  for (const sx of [-1, 1]) rb(torso, 0.17, 0.12, 0.27, O.armor ? shade(V, 1.1) : Cl, sx * 0.3, 0.46, 0, o);
+  let tipPos = null;
+  // backpack
+  if (cos.pack === 'standard') {
+    rb(torso, 0.34, 0.4, 0.17, Pd, 0, 0.28, 0.23, o); rb(torso, 0.3, 0.12, 0.17, C, 0, 0.44, 0.24, o);
+    cyl(torso, 0.07, 0.36, W, 0, 0.12, 0.27, { axis: 'x', rough: 0.8 }); cyl(torso, 0.008, 0.4, D, 0.12, 0.6, 0.27, { rough: 0.5 }); tipPos = [0.12, 0.81, 0.27];
+  } else if (cos.pack === 'radio') {
+    rb(torso, 0.36, 0.44, 0.2, 0x4a5240, 0, 0.27, 0.25, o); rb(torso, 0.26, 0.12, 0.03, 0x2a2f24, 0, 0.36, 0.36, o);
+    for (const sx of [-1, 0, 1]) cyl(torso, 0.025, 0.03, 0xc9cfdb, sx * 0.08, 0.2, 0.36, { axis: 'z', rough: 0.3, metal: 0.8 });
+    cyl(torso, 0.01, 0.7, D, -0.12, 0.8, 0.28, { rough: 0.5 }); tipPos = [-0.12, 1.16, 0.28];
+  } else if (cos.pack === 'tank') {
+    for (const sx of [-1, 1]) { cyl(torso, 0.09, 0.5, 0xb9c2cc, sx * 0.1, 0.28, 0.25, { rough: 0.3, metal: 0.7 }); cyl(torso, 0.04, 0.06, D, sx * 0.1, 0.56, 0.25, { rough: 0.4 }); }
+    rb(torso, 0.3, 0.06, 0.12, D, 0, 0.2, 0.24, o); cyl(torso, 0.015, 0.3, D, 0.0, 0.5, 0.18, { axis: 'x', rough: 0.4 });
+  } else if (cos.pack === 'jetpack') {
+    rb(torso, 0.34, 0.36, 0.14, 0x3a4256, 0, 0.32, 0.22, { rough: 0.35 });
+    for (const sx of [-1, 1]) { cyl(torso, 0.08, 0.42, Cl, sx * 0.12, 0.28, 0.3, { rough: 0.3, metal: 0.6 }); cyl(torso, 0.06, 0.08, D, sx * 0.12, 0.04, 0.3, { r2: 0.75, rough: 0.4 }); bx(torso, 0.07, 0.03, 0.07, 0xff9a3c, sx * 0.12, -0.01, 0.3, { emissive: 0xff8a2a, ei: 2.5, shadow: false, keep: true }); }
+  } else if (cos.pack === 'wings') {
+    rb(torso, 0.22, 0.26, 0.1, D, 0, 0.32, 0.2, o);
+    for (const sx of [-1, 1]) { const f = rb(torso, 0.5, 0.3, 0.025, C, sx * 0.32, 0.38, 0.27, { ...o, rz: sx * 0.35, ry: sx * -0.4 }); f.userData.keep = false; rb(torso, 0.46, 0.04, 0.03, W, sx * 0.33, 0.5, 0.27, { ...o, rz: sx * 0.35, ry: sx * -0.4 }); }
+  }
+  if (O.glow) { bx(torso, 0.025, 0.36, 0.02, C, -0.17, 0.3, -0.195, neon); bx(torso, 0.025, 0.36, 0.02, C, 0.17, 0.3, -0.195, neon); }
+  bakeGroup(torso, O.armor ? 0.45 : 0.72);
+  const tip = tipPos ? bx(torso, 0.02, 0.02, 0.02, 0xff4d5e, tipPos[0], tipPos[1], tipPos[2], { emissive: 0xff4d5e, ei: 3, shadow: false, keep: true }) : null;
   const neck = new THREE.Group(); neck.position.y = 0.52; torso.add(neck);
   const head = new THREE.Group(); head.position.y = 0.18; neck.add(head);
   rb(head, 0.34, 0.33, 0.33, S, 0, 0, 0, o);
-  rb(head, 0.4, 0.2, 0.41, C, 0, 0.13, 0.01, { ...o, r: 0.08 });
-  rb(head, 0.43, 0.04, 0.44, Cd, 0, 0.05, -0.01, { ...o, r: 0.015 });
-  rb(head, 0.12, 0.06, 0.1, Cl, 0, 0.25, 0.02, o);
-  for (const sx of [-1, 1]) { cyl(head, 0.06, 0.05, D, sx * 0.19, -0.01, 0, { axis: 'x', rough: 0.5 }); }
-  bx(head, 0.02, 0.06, 0.02, D, -0.2, -0.07, -0.08, o);
-  rb(head, 0.36, 0.05, 0.05, D, 0, 0.09, -0.17, o);
+  const eyes = () => { for (const sx of [-1, 1]) bx(head, 0.05, 0.05, 0.02, 0x1a1a24, sx * 0.07, 0.03, -0.166, o); bx(head, 0.2, 0.02, 0.02, 0x8a5a3c, 0, 0.1, -0.166, o); };
+  let visor = null;
+  if (cos.head === 'helmet' || cos.head === 'nvg') {
+    rb(head, 0.4, 0.2, 0.41, C, 0, 0.13, 0.01, { ...o, r: 0.08 });
+    rb(head, 0.43, 0.04, 0.44, Cd, 0, 0.05, -0.01, { ...o, r: 0.015 });
+    rb(head, 0.12, 0.06, 0.1, Cl, 0, 0.25, 0.02, o);
+    for (const sx of [-1, 1]) cyl(head, 0.06, 0.05, D, sx * 0.19, -0.01, 0, { axis: 'x', rough: 0.5 });
+    bx(head, 0.02, 0.06, 0.02, D, -0.2, -0.07, -0.08, o);
+    rb(head, 0.36, 0.05, 0.05, D, 0, 0.09, -0.17, o);
+    if (cos.head === 'nvg') { rb(head, 0.14, 0.06, 0.06, D, 0, 0.2, -0.2, o); for (const sx of [-1, 1]) cyl(head, 0.028, 0.09, 0x2a2f3a, sx * 0.04, 0.15, -0.26, { axis: 'z', rough: 0.3, metal: 0.6 }); }
+    visor = 'band';
+  } else if (cos.head === 'cap') {
+    rb(head, 0.37, 0.14, 0.37, C, 0, 0.16, 0.01, { ...o, r: 0.07 }); rb(head, 0.3, 0.025, 0.18, Cd, 0, 0.1, -0.22, { ...o, r: 0.01 });
+    bx(head, 0.04, 0.03, 0.04, W, 0, 0.24, 0.01, o); visor = 'shades';
+  } else if (cos.head === 'beanie') {
+    rb(head, 0.37, 0.18, 0.37, C, 0, 0.15, 0.01, { ...o, r: 0.09 }); rb(head, 0.39, 0.06, 0.39, Cd, 0, 0.08, 0.01, { ...o, r: 0.03 });
+    const pom = new THREE.Mesh(new THREE.IcosahedronGeometry(0.06, 1), mat(W, o)); pom.position.y = 0.27; head.add(pom); eyes();
+  } else if (cos.head === 'bandana') {
+    rb(head, 0.36, 0.07, 0.36, C, 0, 0.13, 0.0, { ...o, r: 0.02 }); bx(head, 0.06, 0.1, 0.06, C, 0.08, 0.1, 0.19, o);
+    rb(head, 0.355, 0.12, 0.05, Cd, 0, -0.08, -0.155, { ...o, r: 0.02 }); eyes();
+  } else if (cos.head === 'headphones') {
+    rb(head, 0.36, 0.06, 0.34, 0x2a2f3a, 0, 0.19, 0, { ...o, r: 0.02 });
+    for (const sx of [-1, 1]) { cyl(head, 0.09, 0.07, C, sx * 0.2, 0.0, 0, { axis: 'x', rough: 0.4 }); cyl(head, 0.07, 0.072, D, sx * 0.205, 0.0, 0, { axis: 'x', rough: 0.4 }); }
+    rb(head, 0.3, 0.06, 0.32, 0x5a3a28, 0, 0.17, 0.0, { ...o, r: 0.03 }); eyes();
+  } else if (cos.head === 'crown') {
+    rb(head, 0.34, 0.08, 0.33, 0x6a4a30, 0, 0.17, 0.0, { ...o, r: 0.03 });
+    const gold = { rough: 0.25, metal: 0.9 };
+    cyl(head, 0.17, 0.08, 0xf2c94c, 0, 0.24, 0, { ...gold, seg: 10 });
+    for (let k = 0; k < 5; k++) { const a = k / 5 * TAU; cyl(head, 0.03, 0.09, 0xf2c94c, Math.cos(a) * 0.15, 0.31, Math.sin(a) * 0.15, { ...gold, r2: 0.1, seg: 6 }); }
+    eyes();
+  }
+  if (visor === 'shades') { bx(head, 0.3, 0.06, 0.03, 0x14161c, 0, 0.03, -0.17, { rough: 0.1, metal: 0.6 }); }
   bakeGroup(head, 0.7);
-  rb(head, 0.32, 0.1, 0.06, 0x1a2a4a, 0, 0.0, -0.18, { rough: 0.12, metal: 0.5, emissive: 0x2a7aff, ei: 0.35, keep: true });
+  if (visor === 'band') rb(head, 0.32, 0.1, 0.06, 0x1a2a4a, 0, 0.0, -0.18, { rough: 0.12, metal: 0.5, emissive: cos.head === 'nvg' ? 0x2aff7a : 0x2a7aff, ei: 0.35, keep: true });
+  if (cos.head === 'nvg') for (const sx of [-1, 1]) cyl(head, 0.022, 0.004, 0x7dff9a, sx * 0.04, 0.15, -0.307, { axis: 'z', emissive: 0x3dff7a, ei: 2, shadow: false, keep: true });
   const aim = new THREE.Group(); aim.position.set(0, 0.42, 0); torso.add(aim);
   const armR = new THREE.Group(); armR.position.set(0.3, 0, 0); aim.add(armR);
-  rb(armR, 0.14, 0.14, 0.26, C, 0, -0.04, -0.04, { ...o, rx: 0.25 });
-  rb(armR, 0.13, 0.13, 0.24, Cd, -0.03, -0.1, -0.24, { ...o, rx: 0.1 });
+  rb(armR, 0.14, 0.14, 0.26, SH, 0, -0.04, -0.04, { ...o, rx: 0.25 });
+  rb(armR, 0.13, 0.13, 0.24, SHd, -0.03, -0.1, -0.24, { ...o, rx: 0.1 });
   rb(armR, 0.13, 0.12, 0.13, D, -0.08, -0.12, -0.37, o);
   bakeGroup(armR, 0.72);
   const armL = new THREE.Group(); armL.position.set(-0.3, 0, 0); aim.add(armL);
-  rb(armL, 0.14, 0.14, 0.28, C, 0.04, -0.05, -0.1, { ...o, rx: 0.12, ry: -0.35 });
-  rb(armL, 0.13, 0.13, 0.26, Cd, 0.15, -0.07, -0.33, { ...o, rx: 0.08, ry: -0.5 });
+  rb(armL, 0.14, 0.14, 0.28, SH, 0.04, -0.05, -0.1, { ...o, rx: 0.12, ry: -0.35 });
+  rb(armL, 0.13, 0.13, 0.26, SHd, 0.15, -0.07, -0.33, { ...o, rx: 0.08, ry: -0.5 });
   rb(armL, 0.13, 0.12, 0.13, D, 0.25, -0.08, -0.5, o);
   bakeGroup(armL, 0.72);
   const gunHolder = new THREE.Group(); gunHolder.position.set(0.19, -0.13, -0.36); aim.add(gunHolder);
-  const r = { root, body, hips, torso, head, neck, aim, armR, armL, legs, gunHolder, gun: null, gunId: null, tag: null, hex, tip };
+  const r = { root, body, hips, torso, head, neck, aim, armR, armL, legs, gunHolder, gun: null, gunId: null, tag: null, hex, tip, cosKey: cos.outfit + cos.head + cos.pack };
   setCharacterGun(r, weaponId);
   if (name) { r.tag = makeNameTag(name, hex); r.tag.position.y = 2.3; root.add(r.tag); }
   root.traverse(m => { if (m.isMesh) m.castShadow = true; });
@@ -5915,7 +6016,8 @@ function makeBot(name, colorIdx, diff, team) {
   if (team !== undefined) { b.team = team; b.hex = TEAMS[team].hex; }
   b.primary = pick(['ar', 'ar', 'smg', 'smg', 'shotgun', 'sniper', 'burst', 'lmg', 'dmr']); b.secondary = pick(['pistol', 'pistol', 'revolver']);
   b.diff = BOT_DIFF[diff] || BOT_DIFF.normal;
-  b.model = buildCharacter(b.hex, b.primary, team !== undefined && Game.me && Game.me.team === team ? name : null);
+  b.cos = randomCos();
+  b.model = buildCharacter(b.hex, b.primary, team !== undefined && Game.me && Game.me.team === team ? name : null, b.cos);
   Game.scene.add(b.model.root);
   b.ai = {};
   return b;
@@ -6542,6 +6644,7 @@ const Progress = {
   unlockText(lv) {
     const out = [];
     for (const id in WEAPONS) if (WEAPONS[id].unlock === lv) out.push(`${WEAPONS[id].name} unlocked`);
+    for (const list of Object.values(COSMETIC_SLOTS)) for (const it of Object.values(list)) if (it.lv === lv) out.push(`${it.name} unlocked`);
     const c = Object.entries(this.unlockAt).find(([, l]) => l === lv); if (c) out.push(`${PLAYER_COLORS[c[0]].name} color unlocked`);
     this.unlocks.push(...out); return out.join(', ') || 'Keep going';
   }
@@ -7271,7 +7374,8 @@ const Net = {
       if (this.entries.size >= MAX_PLAYERS - 1) return;
       const a = new Actor('remote', cleanName(pr.n) || 'Player', clamp(pr.c | 0, 0, PLAYER_COLORS.length - 1));
       a.peer = p.peer; a.renderPos = new THREE.Vector3(); a.snaps = [];
-      a.model = buildCharacter(a.hex, WEAPONS[pr.w] ? pr.w : 'ar', a.name);
+      a.cos = cosFromNet(pr.cs);
+      a.model = buildCharacter(a.hex, WEAPONS[pr.w] ? pr.w : 'ar', a.name, a.cos);
       Game.scene.add(a.model.root);
       a.slots = [{ id: WEAPONS[pr.w] ? pr.w : 'ar', mag: 1 }]; a.cur = 0;
       e = { actor: a, seenShot: maxSeq(pr.sh), seenHit: maxSeq(pr.ht), seenNade: maxSeq(pr.gn), ds: pr.ds | 0, lastT: T };
@@ -7289,6 +7393,8 @@ const Net = {
       a.snaps.push(s); if (a.snaps.length > 30) a.snaps.shift();
       if (a.snaps.length === 1) { a.pos.set(s.x, s.y, s.z); a.renderPos.copy(a.pos); }
     }
+    { const nc = cosFromNet(pr.cs), key = nc.outfit + nc.head + nc.pack;
+      if (a.model && a.model.cosKey !== key && a.alive) { const gid = a.model.gunId || 'ar'; disposeCharacter(a.model); a.cos = nc; a.model = buildCharacter(a.hex, gid, a.name, nc); Game.scene.add(a.model.root); } }
     a.health = clamp(+pr.h || 0, 0, 100); a.shield = clamp(+pr.sd || 0, 0, 100);
     a.kills = (pr.m | 0) === Game.matchId ? clamp(pr.k | 0, 0, 999) : 0;
     a.deaths = (pr.m | 0) === Game.matchId ? clamp(pr.d | 0, 0, 999) : 0;
@@ -7357,7 +7463,7 @@ const Net = {
   build() {
     const me = Game.me;
     return {
-      v: 1, n: me.name, c: me.colorIdx, w: me.weapon ? me.weapon.id : me.primary,
+      v: 1, n: me.name, c: me.colorIdx, cs: (c => [c.outfit, c.head, c.pack])(cleanCos(Settings.d.cos)), w: me.weapon ? me.weapon.id : me.primary,
       p: [r2(me.pos.x), r2(me.pos.y), r2(me.pos.z)], r: [r3(me.yaw), r3(me.pitch)], cr: r2(me.crouch), g: me.grounded ? 1 : 0,
       a: me.alive ? 1 : 0, h: Math.round(me.health), sd: Math.round(me.shield || 0), k: me.kills, d: me.deaths, ds: me.deathSeq,
       kb: me.killer && me.killer.peer ? me.killer.peer : null, kw: me.killWeapon || null, kh: me.killHead ? 1 : 0,
@@ -7394,6 +7500,7 @@ const Net = {
     }
   }
 };
+function cosFromNet(cs) { return Array.isArray(cs) ? cleanCos({ outfit: cs[0], head: cs[1], pack: cs[2] }) : cleanCos(null); }
 function maxSeq(arr) { let m = 0; if (Array.isArray(arr)) for (const x of arr) if (Array.isArray(x) && x[0] > m) m = x[0]; return m; }
 function removeRemote(a) {
   const i = Game.actors.indexOf(a); if (i >= 0) Game.actors.splice(i, 1);
@@ -7884,6 +7991,7 @@ const Game = {
   pings: new Map(), feedItems: [], centerT: 0, bannerT: 0, noticeT: 0, last: 0, fpsAcc: 0, fpsN: 0, envT: 0,
   async boot() {
     await Platform.init(); Platform.loadingStart();
+    Platform.loadCloud(); Platform.watchAuth(); sanitizeProgress();
     if (!Settings.d.name) { const u = await Platform.username(); if (u) { Settings.d.name = u; Settings.save(); } }
     const step = async (pct, text) => { $('loadfill').style.width = pct + '%'; $('loadtext').textContent = text; await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0))); };
     const tips = ['Slide by crouching while you sprint.', 'Headshots deal bonus damage — the Longshot one-shots heads.', 'Health refills after four seconds out of fire.', 'Glowing pads launch you onto the container stacks.', 'The house roofs are reachable by the ramps on their outer walls.'];
@@ -8120,11 +8228,11 @@ const Game = {
     this.miniImg = c; this.miniCtx = $('minimap').getContext('2d');
   },
   updateShowcase() {
-    const id = World.id || 'coral', key = Settings.d.color + '|' + Settings.d.primary + '|' + id;
+    const c = cleanCos(Settings.d.cos), id = World.id || 'coral', key = Settings.d.color + '|' + Settings.d.primary + '|' + id + '|' + c.outfit + c.head + c.pack;
     if (this.show && this.showKey === key) return;
     this.showKey = key;
     if (this.show) disposeCharacter(this.show.model);
-    const S = MAPS[id].show, hex = PLAYER_COLORS[Settings.d.color].hex, model = buildCharacter(hex, Settings.d.primary, null);
+    const S = MAPS[id].show, hex = PLAYER_COLORS[Settings.d.color].hex, model = buildCharacter(hex, Settings.d.primary, null, c);
     this.scene.add(model.root);
     const y = groundAt(S[0], S[2], S[1] + 1);
     this.show = { uid: 9999, model, renderPos: new THREE.Vector3(S[0], y, S[2]), vel: new THREE.Vector3(), yaw: S[3], pitch: -0.08, crouch: 0, grounded: true, alive: true, kind: 'replay', animT: 0, weapon: { id: Settings.d.primary, reloadT: 0 }, overT: 0, slide: 0, hex };
@@ -8213,7 +8321,7 @@ const Game = {
   makeMe() {
     const name = cleanName(Settings.d.name) || 'Player';
     const me = new Actor('local', name, Settings.d.color);
-    me.model = buildCharacter(me.hex, Settings.d.primary, null); me.model.root.visible = false; this.scene.add(me.model.root);
+    me.model = buildCharacter(me.hex, Settings.d.primary, null, Settings.d.cos); me.model.root.visible = false; this.scene.add(me.model.root);
     this.me = me; this.actors.push(me);
     return me;
   },
@@ -8241,7 +8349,7 @@ const Game = {
     const me = this.makeMe();
     const names = BOT_NAMES.slice().sort(() => Math.random() - 0.5);
     if (this.gameMode === 'tdm') {
-      me.team = 0; me.hex = TEAMS[0].hex; disposeCharacter(me.model); me.model = buildCharacter(me.hex, Settings.d.primary, null); me.model.root.visible = false; this.scene.add(me.model.root);
+      me.team = 0; me.hex = TEAMS[0].hex; disposeCharacter(me.model); me.model = buildCharacter(me.hex, Settings.d.primary, null, Settings.d.cos); me.model.root.visible = false; this.scene.add(me.model.root);
       for (let i = 0; i < 7; i++) { const t = i < 3 ? 0 : 1; const b = makeBot(names[i], t === 0 ? 0 : 1, Settings.d.diff, t); this.actors.push(b); spawnActor(b); }
     } else {
       let ci = (Settings.d.color + 1) % 8;
@@ -8570,6 +8678,14 @@ const Game = {
    UI wiring
    ============================================================ */
 function id_isRev(id) { return id === 'revolver'; }
+// keep saved choices valid (e.g. after loading progress from another device)
+function sanitizeProgress() {
+  const d = Settings.d, lv = Progress.level().lv;
+  d.cos = cleanCos(d.cos);
+  for (const [slot, list] of Object.entries(COSMETIC_SLOTS)) if (list[d.cos[slot]].lv > lv) d.cos[slot] = DEFAULT_COS[slot];
+  if (!WEAPONS[d.primary] || WEAPONS[d.primary].slot !== 0) d.primary = 'ar';
+  if (!PLAYER_COLORS[d.color]) d.color = 0;
+}
 const RARITY = { ar: { n: 'Epic', c: '#b57bff' }, smg: { n: 'Rare', c: '#4aa8ff' }, shotgun: { n: 'Rare', c: '#4aa8ff' }, sniper: { n: 'Legendary', c: '#ffb43c' }, pistol: { n: 'Uncommon', c: '#5fd36b' }, burst: { n: 'Epic', c: '#b57bff' }, lmg: { n: 'Rare', c: '#4aa8ff' }, dmr: { n: 'Legendary', c: '#ffb43c' }, revolver: { n: 'Epic', c: '#b57bff' } };
 const UI = {
   h: {}, el: {},
@@ -8764,6 +8880,7 @@ const UI = {
     { const items = [];
       for (const id in WEAPONS) if ((WEAPONS[id].unlock || 0) > L.lv) items.push([WEAPONS[id].unlock, WEAPONS[id].name]);
       for (const [ci, lv] of Object.entries(Progress.unlockAt)) if (lv > L.lv) items.push([lv, `${PLAYER_COLORS[ci].name} color`]);
+      for (const [slot, list] of Object.entries(COSMETIC_SLOTS)) for (const [cid, it] of Object.entries(list)) if (it.lv > L.lv) items.push([it.lv, `${it.name} (${slot === 'head' ? 'headgear' : slot === 'pack' ? 'backpack' : 'outfit'})`]);
       items.sort((a, b) => a[0] - b[0]);
       $('roadmap').innerHTML = items.length ? items.map(([lv, n]) => `<div><em>Lv ${lv}</em>${esc(n)}</div>`).join('') : '<div>Everything is unlocked. Go for Gold and Diamond camos.</div>'; }
     if (!weaponUnlocked(Settings.d.primary)) Settings.d.primary = 'ar';
@@ -8773,6 +8890,16 @@ const UI = {
     for (const id of ['camoRow', 'camoRow2']) { const el = $(id); if (!el) continue; const w = Settings.d.primary, k = Camo.kills(w);
       el.innerHTML = `<span class="hint">${esc(WEAPONS[w].name)} camo · ${k} elims</span>` + CAMOS.map(c => `<button data-c="${c.id}" class="camo c-${c.id}${Camo.unlocked(w, c.id) ? '' : ' locked'}" aria-pressed="${Camo.selected(w) === c.id}" title="${c.name}${Camo.unlocked(w, c.id) ? '' : ' · ' + c.kills + ' eliminations'}"></button>`).join('');
       for (const b of el.querySelectorAll('button')) b.onclick = () => { if (!Camo.unlocked(w, b.dataset.c)) { this.setErr(`${CAMOS.find(c => c.id === b.dataset.c).name} needs ${CAMOS.find(c => c.id === b.dataset.c).kills} eliminations with the ${WEAPONS[w].name}.`); return; } Settings.d.camo = Settings.d.camo || {}; Settings.d.camo[w] = b.dataset.c; Settings.save(); this.refreshMenu(); Sound.ui(); }; }
+    { const lv = Progress.level().lv, cur = cleanCos(Settings.d.cos);
+      for (const [slot, list] of Object.entries(COSMETIC_SLOTS)) {
+        const el = $('cos-' + slot); if (!el) continue;
+        el.innerHTML = Object.entries(list).map(([cid, it]) => `<button data-slot="${slot}" data-id="${cid}" aria-pressed="${cur[slot] === cid}" class="${it.lv > lv ? 'locked' : ''}"><b>${esc(it.name)}</b><span>${it.lv > lv ? 'Level ' + it.lv : cur[slot] === cid ? 'Equipped' : 'Unlocked'}</span></button>`).join('');
+        for (const b of el.children) b.onclick = () => {
+          const it = COSMETIC_SLOTS[b.dataset.slot][b.dataset.id];
+          if (it.lv > Progress.level().lv) { this.setErr(`${it.name} unlocks at level ${it.lv}.`); Sound.ui('hover'); return; }
+          Settings.d.cos = Object.assign(cleanCos(Settings.d.cos), { [b.dataset.slot]: b.dataset.id }); Settings.save(); this.setErr(''); this.refreshMenu(); Sound.ui();
+        };
+      } }
     const chs = Challenges.list(); $('chpanel').innerHTML = '<h3>Daily challenges</h3>' + chs.map(c => `<div class="ch${c.done ? ' done' : ''}"><span>${esc(c.text)}</span><i><b style="width:${Math.round(c.n / c.goal * 100)}%"></b></i><em>${c.done ? 'Done' : c.n + '/' + c.goal}</em></div>`).join('') + '<p>+750 XP each, new ones every day</p>';
     [...$('diffSeg').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.d === Settings.d.diff));
     $('diffLabel').textContent = { easy: 'Easy bots', normal: 'Normal bots', hard: 'Hard bots' }[Settings.d.diff];
@@ -8839,6 +8966,29 @@ const Platform = {
       });
     } catch (e) { finish(); }
     setTimeout(() => { if (!this.adActive) finish(); }, 4000); // never block the player if no ad shows
+  },
+  // Progress is mirrored to the CrazyGames account (SDK data module) so it follows the player
+  // across devices and survives clearing the browser. Device-specific settings stay local.
+  cloud: false, DEVICE_KEYS: ['quality', 'touchInit', 'fps'],
+  cloudData() { return this.ready && this.sdk.data && typeof this.sdk.data.getItem === 'function' ? this.sdk.data : null; },
+  loadCloud() {
+    const D = this.cloudData(); if (!D) return false;
+    let remote = null;
+    try { const raw = D.getItem('tidebreak.v1'); remote = raw ? JSON.parse(raw) : null; } catch (e) { remote = null; }
+    if (remote && typeof remote === 'object' && (+remote.xp || 0) >= (+Settings.d.xp || 0)) {
+      for (const k in remote) if (!this.DEVICE_KEYS.includes(k)) Settings.d[k] = remote[k];
+    }
+    this.cloud = true;
+    Settings.save();                    // pushes the merged progress back up (also migrates old local progress)
+    return true;
+  },
+  cloudSave(json) {
+    if (!this.cloud) return; const D = this.cloudData(); if (!D) return;
+    try { D.setItem('tidebreak.v1', json); } catch (e) {}
+  },
+  watchAuth() {
+    if (!this.ready || !this.sdk.user || typeof this.sdk.user.addAuthListener !== 'function') return;
+    try { this.sdk.user.addAuthListener(() => { if (this.loadCloud()) { sanitizeProgress(); if (typeof UI !== 'undefined' && UI.refreshMenu) UI.refreshMenu(); } }); } catch (e) {}
   },
   async username() {
     if (!this.ready) return null;
