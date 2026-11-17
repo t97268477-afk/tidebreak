@@ -249,7 +249,7 @@ input[type=range]{accent-color:var(--sun);width:100%}
 .btn.big .sub{font-family:var(--body);font-weight:800;font-size:14px}
 .opname{position:absolute;left:6vw;bottom:9vh;font-family:var(--display);font-size:clamp(30px,4vw,54px);color:#fff;text-shadow:0 4px 0 rgba(0,0,0,.35),0 8px 30px rgba(0,0,0,.35);transform:rotate(-2deg)}
 .opname small{display:block;font-family:var(--body);font-weight:900;font-size:15px;color:var(--sun);text-shadow:0 2px 0 rgba(0,0,0,.4);transform:none}
-@media (max-width:860px){.tabs button{padding:8px 10px}.mpanel,.mplay{width:auto;left:16px;right:16px}.mpanel{top:150px}.mtop{flex-wrap:wrap}.opname{display:none}.cards{grid-template-columns:1fr}}
+@media (max-width:860px){.mtop{flex-wrap:nowrap !important;gap:14px !important;padding:8px 14px !important}.mlogo{font-size:28px !important}.tabs{gap:12px !important}.tabs button{padding:6px 0 !important;font-size:11px !important;letter-spacing:1px !important}.mright .lvl>span{display:none}.iconbtn{width:36px;height:36px}.mpanel,.mplay{width:auto;left:16px;right:16px}.mpanel{top:64px}.opname{display:none}.cards{grid-template-columns:1fr}}
 #scope{background:none !important;will-change:transform,opacity}
 #scope::before,#scope::after{display:none}
 #scopeCv{position:absolute;inset:0;width:100%;height:100%}
@@ -350,6 +350,38 @@ body.touch #topbar{transform:translateX(-50%) scale(.82);transform-origin:top ce
 .t-emote{right:196px;top:96px;width:60px;height:52px;border-radius:14px;font-size:10px}
 #roomchipver{margin-left:8px;font-size:11px;color:var(--muted);letter-spacing:.5px}
 #buildtag{position:absolute;left:12px;bottom:8px;font:900 10px var(--body);letter-spacing:1px;color:rgba(255,255,255,.45);pointer-events:none}
+@media (max-height:600px){
+  .mtop{padding:8px 20px}.mlogo{font-size:34px !important}
+  .mpanel{top:64px;bottom:96px;padding:14px 16px}
+  .mplay{bottom:12px}.btn.big{height:56px;font-size:28px}.playsum{display:none}
+  .opname{display:none}.cards button{min-height:64px}
+}
+@media (max-height:420px){ .mpanel{top:56px;bottom:84px} .btn.big{height:48px;font-size:24px} .mtop .tabs button{padding:4px 0;font-size:12px} }
+/* ---------- Mythical rarity ---------- */
+.wcard.mythic{background:linear-gradient(135deg,#2a0309,#7a0c1d 45%,#3a050c) !important;border-color:#ff2e4d !important;overflow:hidden;animation:mythPulse 2.2s ease-in-out infinite;box-shadow:0 0 0 1px rgba(255,46,77,.6),0 0 18px rgba(255,46,77,.45)}
+.wcard.mythic>*{position:relative;z-index:1}
+.wcard.mythic::before{content:"";position:absolute;left:0;right:0;top:0;bottom:0;z-index:0;pointer-events:none;opacity:.9;
+  background-image:radial-gradient(circle,rgba(255,130,150,.95) 0 1.5px,transparent 2.6px),radial-gradient(circle,rgba(255,200,120,.85) 0 1px,transparent 2px),radial-gradient(circle,rgba(255,50,80,.95) 0 2px,transparent 3.2px);
+  background-size:38px 46px,27px 33px,53px 62px;background-position:0 0,13px 7px,29px 19px;animation:mythRise 3.2s linear infinite}
+.wcard.mythic::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-120%);animation:shine 2.6s ease-in-out infinite}
+.wcard.mythic b{color:#fff;text-shadow:0 0 10px rgba(255,46,77,.95),0 2px 0 #4a0010}
+.wcard.mythic span{color:#ffc2ca !important}
+.wcard.mythic .rar{color:#ff9aaa !important;text-shadow:0 0 8px #ff2e4d;letter-spacing:2px;text-transform:uppercase}
+.wcard.mythic .stripe{background:#ff2e4d !important;box-shadow:0 0 12px #ff2e4d}
+.wcard.mythic[aria-pressed="true"]{border-color:#ffd0d6 !important}
+@keyframes mythRise{to{background-position:0 -46px,13px -26px,29px -43px}}
+@keyframes mythPulse{50%{box-shadow:0 0 0 1px rgba(255,46,77,.95),0 0 32px rgba(255,46,77,.8)}}
+#armory.mythic h3{color:#fff;text-shadow:0 0 18px rgba(255,46,77,.95),0 0 40px rgba(255,46,77,.6),0 4px 0 #4a0010;animation:mythText 1.4s ease-in-out infinite alternate}
+#armory.mythic .rar{text-shadow:0 0 10px #ff2e4d;letter-spacing:3px}
+#armory.mythic .wstats i{overflow:visible;background:rgba(255,46,77,.18)}
+#armory.mythic .wstats i b{background:linear-gradient(90deg,#ff2e4d,#ff9a5a,#ffe2a0);width:104% !important;box-shadow:0 0 12px #ff2e4d,0 0 24px rgba(255,90,60,.6);animation:mythBar 1.1s ease-in-out infinite alternate}
+#armory.mythic .wstats em{position:relative;z-index:2;padding-left:10px;color:#fff;text-shadow:0 0 10px #ff2e4d,0 0 3px #4a0010;font-size:15px}
+#armory.mythic .wstats{grid-template-columns:110px 1fr 52px}
+@keyframes mythBar{to{width:109% !important;filter:brightness(1.35)}}
+#armory.mythic .meta div{border-color:rgba(255,46,77,.5);background:rgba(255,46,77,.1)}
+@keyframes mythText{to{text-shadow:0 0 30px rgba(255,46,77,1),0 0 70px rgba(255,90,60,.85),0 4px 0 #4a0010}}
+#menu.armory-on.mythic::before{background:radial-gradient(80% 90% at 22% 55%,rgba(255,46,77,.28),transparent 60%),linear-gradient(90deg,rgba(26,2,6,.85),rgba(26,2,6,.55) 45%,rgba(6,10,24,.25) 70%,rgba(6,10,24,.5))}
+#ammo.mythic .wname{color:#ff6a7e;text-shadow:0 0 10px #ff2e4d,0 2px 0 rgba(0,0,0,.5)}
 #confetti{position:absolute;inset:0;z-index:70;pointer-events:none}
 #hitmarker.sh i{background:#6cc8ff}
 .dn.sh{color:#7fd0ff}
@@ -2944,7 +2976,7 @@ body.touch #topbar{transform:translateX(-50%) scale(.82);transform-origin:top ce
 } )();
 
 
-const BUILD = '17.3';   // shown in the menu and room badge, and sent to other players to catch version mismatches
+const BUILD = '18.1';   // shown in the menu and room badge, and sent to other players to catch version mismatches
 'use strict';
 /* ============================================================
    TIDEBREAK — core utilities
@@ -3978,6 +4010,9 @@ const WEAPONS = {
   jug: { id: 'jug', name: 'Juggernaut', blurb: 'Rotary cannon. Spin up, then shred', slot: 0, dmg: 18, hs: 1.4, interval: 0.06, auto: true, mag: 120, reload: 5.2, pellets: 1,
         hip: 0.05, ads: 0.012, move: 0.05, bloom: 0.002, bloomMax: 0.035, kick: 0.0042, kickYaw: 0.0045, range: [30, 62], minMul: 0.7,
         adsFov: 0.78, adsTime: 0.34, speed: 0.8, color: 0x2b303c, viewKick: 0.02, unlock: 12, spin: 0.42 },
+  maelstrom: { id: 'maelstrom', name: 'Maelstrom', blurb: 'Mythical storm rifle. Lightning chains to 4 enemies and heals you', slot: 0, dmg: 80, hs: 1.6, interval: 0.09, auto: true, mag: 60, reload: 1.6, pellets: 1,
+        hip: 0.008, ads: 0.001, move: 0.006, bloom: 0.001, bloomMax: 0.008, kick: 0.009, kickYaw: 0.004, range: [100, 160], minMul: 0.95,
+        adsFov: 0.7, adsTime: 0.14, speed: 1.08, lifesteal: 6, color: 0x15121c, viewKick: 0.03, unlock: 20, chain: true },
   bazooka: { id: 'bazooka', name: 'Bazooka', blurb: 'Rockets with huge splash damage', slot: 0, dmg: 125, hs: 1, interval: 0.6, auto: false, mag: 1, reload: 2.8, pellets: 1,
         hip: 0.03, ads: 0.004, move: 0.03, bloom: 0, bloomMax: 0, kick: 0.07, kickYaw: 0.012, range: [60, 120], minMul: 1,
         adsFov: 0.62, adsTime: 0.34, speed: 0.86, color: 0x4f5b3a, viewKick: 0.2, unlock: 10, rocket: true },
@@ -4293,7 +4328,8 @@ function buildGun(id, forViewmodel) {
   if (id === 'jug') buildJuggernaut(g, ud, { A, vm, poly, metal, paint, glow });
   if (id === 'bazooka') buildBazooka(g, ud, { A, vm, poly, metal, paint, glow });
   if (id === 'viper') buildViper(g, ud, { A, vm, poly, metal, paint, glow });
-  if (forViewmodel && id !== 'jug' && id !== 'bazooka' && id !== 'viper') addGunDetails(g, id, A);
+  if (id === 'maelstrom') buildMaelstrom(g, ud, { A, vm, poly, metal, paint, glow });
+  if (forViewmodel && !['jug', 'bazooka', 'viper', 'maelstrom'].includes(id)) addGunDetails(g, id, A);
   if (ud.mag) ud.magHome = ud.mag.position.clone();
   if (ud.pump) ud.pumpHome = ud.pump.position.clone();
   const mz = new THREE.Object3D(); mz.position.set(0, ud.muzzleY, ud.muzzleZ); g.add(mz); ud.muzzle = mz;
@@ -4409,7 +4445,7 @@ function limbSeg(parent, A, B, r, hex, opts = {}) {
   const key = r.toFixed(3) + '_' + L.toFixed(3);
   let geo = CAPS[key];
   if (!geo) {
-    const parts = [new THREE.CylinderGeometry(r, r * 0.92, L, 12, 1, true), new THREE.SphereGeometry(r, 12, 8), new THREE.SphereGeometry(r * 0.92, 12, 8)];
+    const parts = [new THREE.CylinderGeometry(r, r * 0.92, L, 10, 1, true), new THREE.SphereGeometry(r, 10, 6), new THREE.SphereGeometry(r * 0.92, 10, 6)];
     parts[1].translate(0, L / 2, 0); parts[2].translate(0, -L / 2, 0);
     const P = [], N = [];
     for (const g of parts) { const ng = g.index ? g.toNonIndexed() : g; const pa = ng.attributes.position, na = ng.attributes.normal; for (let i = 0; i < pa.count; i++) { P.push(pa.getX(i), pa.getY(i), pa.getZ(i)); N.push(na.getX(i), na.getY(i), na.getZ(i)); } }
@@ -4881,6 +4917,107 @@ function buildViper(g, ud, P) {
   rb(mag, 0.052, 0.018, 0.066, BLK2, 0, -0.075, 0.014, { ...poly, rx: 0.22, r: 0.005 });
   rb(mag, 0.03, 0.006, 0.05, BR2, 0, -0.083, 0.016, { ...bronze, rx: 0.22 });
   ud.slide = slide; ud.slideZ = -0.08; ud.mag = mag; ud.sightY = 0.128; ud.muzzleZ = -0.26; ud.muzzleY = 0.088;
+}
+
+/* ============================================================
+   Maelstrom — MYTHICAL storm rifle.
+   Dark gunmetal body with crimson runes, a glass vortex chamber with a
+   swirling energy core, three levitating rings around the barrel, twin
+   rail prongs with lightning crackling between them, a focus orb at the
+   muzzle, blade fins, and a glowing energy-cell magazine.
+   Animated parts live in ud: vortex, rings, focus, arcs, glowMat, coreMat.
+   ============================================================ */
+function buildMaelstrom(g, ud, P) {
+  const { vm, poly, metal, paint, glow } = P;
+  const BODY = P.A, BODY2 = 0x0d0b12, CHROME = 0x9aa0ad, RED = 0xff2e4d, RED2 = 0xff7a3a;
+  const sh = !vm, chrome = { ...metal, rough: 0.18, metal: 0.95 };
+  // shared glowing materials (animated every frame)
+  const glowMat = new THREE.MeshBasicMaterial({ color: RED, toneMapped: false }); glowMat.color.multiplyScalar(2.2); glowMat.userData = { keep: true }; ud.glowMat = glowMat;
+  const coreMat = new THREE.MeshBasicMaterial({ color: 0xffd0d6, toneMapped: false }); coreMat.color.multiplyScalar(3); coreMat.userData = { keep: true }; ud.coreMat = coreMat;
+  const G = (geo, m2, x, y, z, rx = 0, ry = 0, rz = 0) => { const m = new THREE.Mesh(geo, m2); m.position.set(x, y, z); m.rotation.set(rx, ry, rz); m.userData.keep = true; m.castShadow = false; return m; };
+  const box = (w, h, d) => { const b = boxGeo(); return b; };
+  const glowBox = (parent, w, h, d, x, y, z, o = {}) => { const m = G(boxGeo(), glowMat, x, y, z, o.rx || 0, o.ry || 0, o.rz || 0); m.scale.set(w, h, d); parent.add(m); return m; };
+  // ---------- stock (skeletal) ----------
+  rb(g, 0.05, 0.022, 0.2, BODY, 0, 0.05, 0.16, { ...paint, r: 0.008 });
+  rb(g, 0.05, 0.02, 0.17, BODY, 0, -0.025, 0.17, { ...paint, rx: -0.12, r: 0.008 });
+  rb(g, 0.055, 0.1, 0.03, BODY2, 0, 0.012, 0.26, { ...poly, r: 0.012 });
+  glowBox(g, 0.004, 0.006, 0.16, 0.026, 0.05, 0.16); glowBox(g, 0.004, 0.006, 0.16, -0.026, 0.05, 0.16);
+  // ---------- grip & trigger ----------
+  rb(g, 0.046, 0.12, 0.058, BODY2, 0, -0.065, 0.03, { ...poly, rx: 0.3, r: 0.01 });
+  for (let k = 0; k < 4; k++) bx(g, 0.048, 0.004, 0.05, 0x1a1720, 0, -0.035 - k * 0.022, 0.022 + k * 0.007, { ...poly, rx: 0.3 });
+  bx(g, 0.01, 0.006, 0.075, BODY2, 0, -0.025, -0.04, metal); rb(g, 0.011, 0.028, 0.009, RED, 0, -0.012, -0.025, { ...metal, rx: 0.3, emissive: RED, ei: 0.8 });
+  // ---------- receiver: angular plates with crimson runes ----------
+  rb(g, 0.07, 0.085, 0.3, BODY, 0, 0.035, -0.1, { ...paint, r: 0.014 });
+  for (const sx of [-1, 1]) {
+    rb(g, 0.008, 0.06, 0.24, BODY2, sx * 0.038, 0.035, -0.1, { ...metal, r: 0.004 });
+    for (let k = 0; k < 5; k++) { glowBox(g, 0.003, 0.004, 0.022, sx * 0.0425, 0.05 - (k % 2) * 0.02, -0.02 - k * 0.04, { rx: (k % 2 ? 0.6 : -0.6) }); }   // rune strokes
+    glowBox(g, 0.003, 0.003, 0.2, sx * 0.0425, 0.012, -0.1);
+  }
+  rb(g, 0.04, 0.012, 0.2, CHROME, 0, 0.083, -0.1, { ...chrome, r: 0.004 });                       // top rail
+  for (let k = 0; k < 8; k++) bx(g, 0.042, 0.004, 0.006, BODY2, 0, 0.09, -0.02 - k * 0.022, poly);
+  // blade fins (top and sides)
+  for (const [x, y, rz] of [[0, 0.095, 0], [0.04, 0.06, -0.9], [-0.04, 0.06, 0.9]]) {
+    const fin = new THREE.Group(); g.add(fin); fin.position.set(x, y, -0.2); fin.rotation.z = rz;
+    rb(fin, 0.006, 0.035, 0.09, BODY2, 0, 0.015, 0, { ...metal, rx: -0.35, r: 0.002 });
+    glowBox(fin, 0.007, 0.004, 0.085, 0, 0.032, 0.008, { rx: -0.35 });
+  }
+  // ---------- vortex chamber ----------
+  const vz = -0.13;
+  cyl(g, 0.045, 0.012, CHROME, 0, 0.035, vz + 0.075, { ...chrome, axis: 'z', seg: 18 });
+  cyl(g, 0.045, 0.012, CHROME, 0, 0.035, vz - 0.075, { ...chrome, axis: 'z', seg: 18 });
+  { const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.041, 0.041, 0.14, 20, 1, true), new THREE.MeshStandardMaterial({ color: 0xffc0c8, transparent: true, opacity: 0.18, roughness: 0.05, metalness: 0.3, side: THREE.DoubleSide, depthWrite: false }));
+    glass.rotation.x = Math.PI / 2; glass.position.set(0, 0.035, vz); glass.userData.keep = true; glass.castShadow = false; g.add(glass); }
+  const vortex = new THREE.Group(); vortex.position.set(0, 0.035, vz); g.add(vortex);
+  { const core = G(new THREE.CylinderGeometry(0.009, 0.009, 0.13, 10), coreMat, 0, 0, 0, Math.PI / 2); vortex.add(core);
+    const ribbonMat = new THREE.MeshBasicMaterial({ color: RED, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false, side: THREE.DoubleSide }); ribbonMat.color.multiplyScalar(2);
+    for (let k = 0; k < 3; k++) {
+      const pts = []; for (let i = 0; i <= 40; i++) { const t = i / 40, a = t * Math.PI * 4 + k * TAU / 3; pts.push(new THREE.Vector3(Math.cos(a) * 0.026, Math.sin(a) * 0.026, (t - 0.5) * 0.13)); }
+      const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 60, 0.0035, 5, false), ribbonMat); tube.userData.keep = true; vortex.add(tube);
+    }
+  }
+  ud.vortex = vortex;
+  // ---------- barrel: twin rail prongs, levitating rings, focus orb ----------
+  for (const sy of [1, -1]) {
+    const y = 0.035 + sy * 0.03;
+    rb(g, 0.034, 0.016, 0.42, BODY, 0, y, -0.45, { ...paint, r: 0.006 });
+    glowBox(g, 0.024, 0.003, 0.4, 0, y - sy * 0.0085, -0.45);                                       // inner glowing edge facing the bore
+    rb(g, 0.04, 0.02, 0.03, CHROME, 0, y, -0.66, { ...chrome, r: 0.005 });                            // prong tips
+  }
+  cyl(g, 0.009, 0.4, BODY2, 0, 0.035, -0.45, { ...metal, axis: 'z', seg: 10 });                        // spine
+  const rings = [];
+  for (const [z, r] of [[-0.3, 0.06], [-0.44, 0.066], [-0.58, 0.058]]) {
+    const ring = new THREE.Group(); ring.position.set(0, 0.035, z); g.add(ring);
+    const t1 = new THREE.Mesh(new THREE.TorusGeometry(r, 0.006, 8, 40), mat(CHROME, { ...chrome, shadow: sh })); ring.add(t1);
+    const t2 = G(new THREE.TorusGeometry(r, 0.0025, 6, 40), glowMat, 0, 0, 0.004); ring.add(t2);
+    for (let k = 0; k < 3; k++) { const a = k / 3 * TAU; const n = new THREE.Mesh(boxGeo(), mat(BODY2, metal)); n.scale.set(0.012, 0.012, 0.012); n.position.set(Math.cos(a) * r, Math.sin(a) * r, 0); ring.add(n); }
+    rings.push(ring);
+  }
+  ud.rings = rings;
+  const focus = G(new THREE.IcosahedronGeometry(0.014, 1), coreMat, 0, 0.035, -0.69); g.add(focus);
+  if (typeof Tex !== 'undefined' && Tex.glow) { const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: Tex.glow, color: RED, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false })); halo.material.color.multiplyScalar(2); halo.scale.setScalar(0.09); focus.add(halo); ud.halo = halo; }
+  ud.focus = focus;
+  // lightning arcs between the prongs (first person only; regenerated every few frames)
+  if (vm) {
+    ud.arcs = [];
+    for (let k = 0; k < 3; k++) {
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(7 * 3), 3));
+      const l = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xff8a9a, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false })); l.frustumCulled = false; l.userData.keep = true; g.add(l); ud.arcs.push(l);
+    }
+  }
+  // ---------- holographic sight (red) ----------
+  { const hs = new THREE.Group(); g.add(hs); hs.position.set(0, 0.093, -0.06);
+    rb(hs, 0.046, 0.012, 0.06, BODY2, 0, 0.004, 0, metal);
+    for (const sx of [-1, 1]) rb(hs, 0.006, 0.05, 0.012, BODY2, sx * 0.027, 0.032, -0.015, metal);
+    rb(hs, 0.06, 0.008, 0.014, BODY2, 0, 0.058, -0.015, { ...metal, r: 0.003 });
+    glowBox(hs, 0.05, 0.002, 0.004, 0, 0.062, -0.015);
+    bx(hs, 0.048, 0.042, 0.002, 0xffc0c8, 0, 0.032, -0.015, { opacity: 0.12, rough: 0.05, shadow: false, keep: true });
+    reticle(hs, 'jug', 0, 0.032, -0.017, 0.042, RED); }
+  // ---------- energy cell magazine ----------
+  const mag = new THREE.Group(); g.add(mag); mag.position.set(0, -0.035, -0.12);
+  { const cell = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.1, 6), mat(BODY2, { ...metal, shadow: sh })); cell.position.y = -0.03; mag.add(cell);
+    const win = G(new THREE.CylinderGeometry(0.031, 0.031, 0.05, 6, 1, true), glowMat, 0, -0.03, 0); mag.add(win);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.033, 0.033, 0.012, 6), mat(CHROME, chrome)); cap.position.y = -0.085; mag.add(cap); }
+  ud.mag = mag; ud.sightY = 0.125; ud.muzzleZ = -0.7; ud.muzzleY = 0.035;
 }
 
 /* ============================================================
@@ -6199,6 +6336,7 @@ const FX = {
     const s = rand(0.11, 0.16); d.m.scale.set(s, s, s); d.m.material.opacity = 1; d.m.visible = true; d.t = 12;
   },
   tracer(a, b, hex = 0xfff1b0, width = 0.018, speed = 380) {
+    return;   // bullet lines are turned off everywhere (shots, bots, online players, killcam, sniper trail)
     const tr = this.tracers.find(t => !t.on); if (!tr) return;
     const d = new THREE.Vector3().subVectors(b, a), dist = d.length(); if (dist < 0.5) return;
     d.divideScalar(dist);
@@ -6206,6 +6344,7 @@ const FX = {
     tr.m.material.color.set(hex).multiplyScalar(tr.enemy ? 2.2 : 3.2); tr.m.material.opacity = tr.enemy ? 0.6 : 0.85; tr.m.visible = true;
   },
   trail(a, b) {
+    return;   // bullet lines are turned off everywhere (shots, bots, online players, killcam, sniper trail)
     // a thin bright streak that vanishes in half a second, plus a soft smoke ribbon
     // that drifts and dissolves along the bullet's path (everything gone within 2 s)
     const tr = this.trails.find(t => t.t <= 0) || this.trails[0];
@@ -6478,6 +6617,7 @@ function fireShot(shooter, origin, dir, W, spread, muzzleWorld) {
   for (const [victim, e] of hits) {
     applyDamage(victim, e.dmg, shooter, e.head, W.id, e.point);
   }
+  if (W.chain && hits.size) chainLightning(shooter, hits, W);
   return { end: firstEnd, hits };
 }
 let lastWhiz = 0;
@@ -6550,9 +6690,12 @@ function chooseSpawn(a) {
   const enemies = Game.actors.filter(o => o !== a && o.alive && !sameTeam(o, a));
   let best = null, bestScore = -Infinity;
   for (const s of World.spawns) {
-    let md = 80;
-    for (const e of enemies) md = Math.min(md, Math.hypot(e.pos.x - s.x, e.pos.z - s.z));
-    const score = md + rand(0, 10);
+    let md = 80, seen = 0;
+    for (const e of enemies) {
+      const d = Math.hypot(e.pos.x - s.x, e.pos.z - s.z); md = Math.min(md, d);
+      if (d < 50 && lineClear(new THREE.Vector3(s.x, s.y + 1.5, s.z), new THREE.Vector3(e.pos.x, e.pos.y + 1.5, e.pos.z))) seen++;   // an enemy could see you appear
+    }
+    const score = md - seen * 25 + rand(0, 10);
     if (score > bestScore) { bestScore = score; best = s; }
   }
   return best || new THREE.Vector3(0, 0, 0);
@@ -7254,6 +7397,10 @@ function animateCharacter(a, dt) {
   // smooth turning instead of snapping to the aim direction
   m.yawS = m.yawS === undefined || !isFinite(m.yawS) ? a.yaw : m.yawS + angWrap(a.yaw - m.yawS) * Math.min(1, dt * 16);
   m.root.rotation.y = m.yawS;
+  if (Game.camera && a.kind !== 'local') {   // shadow LOD: far characters skip the (expensive) shadow pass
+    const far = Game.camera.position.distanceToSquared(m.root.position) > 22 * 22;
+    if (m.shadowFar !== far) { m.shadowFar = far; m.root.traverse(o => { if (!o.isMesh) return; if (o.userData.cs0 === undefined) o.userData.cs0 = o.castShadow; o.castShadow = !far && o.userData.cs0; }); }
+  }
   if (a.emote && a.alive && EMOTE_BY_ID[a.emote]) { emotePose(a, m, dt); return; }
   if (m.wasEmote) { m.wasEmote = false; m.gunHolder.visible = true; if (m.armMode === 'relaxed') { m.armMode = 'gun'; buildArms(m); } m.armR.rotation.set(0, 0, 0); m.armL.rotation.set(0, 0, 0); m.body.position.set(0, 0, 0); m.hips.rotation.set(0, 0, 0); m.torso.rotation.set(0, 0, 0); }
   if (m.dieT >= 0 && !a.alive) {
@@ -7327,6 +7474,7 @@ function animateCharacter(a, dt) {
   if (m.prot) { m.prot.visible = a.protect > 0 && a.protect < 5; if (m.prot.visible) m.prot.material.opacity = 0.25 + Math.abs(Math.sin(T * 6)) * 0.3; }
   // rotary cannon barrels spin while this character is firing
   if (m.gun && m.gun.userData.barrels) { const firing = a.lastShotT && now() - a.lastShotT < 0.25; m.gunSpin = damp(m.gunSpin || 0, firing ? 1 : 0, firing ? 6 : 1.5, dt); m.gun.userData.barrels.rotation.z += dt * m.gunSpin * 35; }
+  if (m.gun && m.gun.userData.vortex) MaelVM.model(m, a, dt);
   if (m.tag) m.tag.visible = a.kind === 'remote' || (a.team !== undefined && Game.me && a.team === Game.me.team);
   if (a.overT > 0 && !m.aura) { m.aura = new THREE.Sprite(new THREE.SpriteMaterial({ map: Tex.glow, color: 0xff5ec4, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.55, toneMapped: false })); m.aura.scale.set(2.2, 3, 1); m.aura.position.y = 1.0; m.root.add(m.aura); }
   if (m.aura) { m.aura.visible = a.overT > 0; m.aura.material.opacity = 0.4 + Math.sin(T * 8) * 0.15; }
@@ -7644,10 +7792,10 @@ for (const k of ['magout', 'magin', 'slap', 'rack', 'slide', 'boltup', 'boltback
 /* ---------------- animation data ---------------- */
 // left-hand rest position (gun space) — matches the glove placement in buildViewmodels
 const HAND_REST = { ar: [-0.005, -0.015, -0.46], smg: [-0.005, -0.015, -0.33], shotgun: [-0.005, -0.015, -0.46], sniper: [-0.005, -0.015, -0.52], burst: [-0.005, -0.015, -0.43],
-  lmg: [-0.005, -0.015, -0.5], dmr: [-0.005, -0.015, -0.53], jug: [-0.035, -0.095, -0.31], bazooka: [-0.005, -0.015, -0.28], viper: [-0.04, -0.08, 0.03], pistol: [-0.04, -0.08, 0.03], revolver: [-0.04, -0.08, 0.03] };
+  lmg: [-0.005, -0.015, -0.5], dmr: [-0.005, -0.015, -0.53], jug: [-0.035, -0.095, -0.31], bazooka: [-0.005, -0.015, -0.28], maelstrom: [-0.005, -0.02, -0.32], viper: [-0.04, -0.08, 0.03], pistol: [-0.04, -0.08, 0.03], revolver: [-0.04, -0.08, 0.03] };
 // where the hand grabs to cycle the action (gun space)
-const HAND_CHARGE = { ar: [0.02, 0.105, 0.03], burst: [0.02, 0.1, 0.03], dmr: [0.02, 0.1, 0.02], smg: [0.05, 0.08, -0.05], lmg: [0.07, 0.07, -0.1], viper: [0.0, 0.11, 0.08], pistol: [0.0, 0.11, 0.08], sniper: [0.09, 0.075, 0.05], revolver: [-0.05, 0.06, -0.07] };
-const RELOAD_STYLE = { viper: 'pistol', bazooka: 'bazooka', jug: 'jug', ar: 'rifle', burst: 'rifle', dmr: 'rifle', smg: 'rifle', lmg: 'rifle', pistol: 'pistol', sniper: 'bolt', revolver: 'revolver', shotgun: 'shell' };
+const HAND_CHARGE = { ar: [0.02, 0.105, 0.03], burst: [0.02, 0.1, 0.03], dmr: [0.02, 0.1, 0.02], smg: [0.05, 0.08, -0.05], lmg: [0.07, 0.07, -0.1], maelstrom: [0.02, 0.1, 0.03], viper: [0.0, 0.11, 0.08], pistol: [0.0, 0.11, 0.08], sniper: [0.09, 0.075, 0.05], revolver: [-0.05, 0.06, -0.07] };
+const RELOAD_STYLE = { maelstrom: 'rifle', viper: 'pistol', bazooka: 'bazooka', jug: 'jug', ar: 'rifle', burst: 'rifle', dmr: 'rifle', smg: 'rifle', lmg: 'rifle', pistol: 'pistol', sniper: 'bolt', revolver: 'revolver', shotgun: 'shell' };
 // gun poses: rotation (x pitch, y yaw, z roll) and position offsets
 const GP = { rest: [[0, 0, 0], [0, 0, 0]], tilt: [[0.18, 0.18, -0.42], [0.015, 0.02, 0]], tilt2: [[0.24, 0.22, -0.52], [0.02, 0.01, 0.01]], slap: [[0.3, 0.16, -0.46], [0.015, 0.04, 0]],
   charge: [[0.08, -0.06, 0.16], [-0.03, 0.02, -0.02]], jolt: [[0.14, -0.08, 0.2], [-0.03, 0.035, -0.01]], bolt: [[0.06, 0.12, -0.22], [0.02, -0.01, -0.04]], boltj: [[0.12, 0.12, -0.2], [0.02, 0.005, -0.03]],
@@ -8477,6 +8625,109 @@ const BazookaReload = {
 };
 
 /* ============================================================
+   Maelstrom behaviour.
+   Every hit jumps as red chain lightning to up to 2 more enemies within
+   9 m (in sight of the first). Impacts burst into a small red storm.
+   ============================================================ */
+const CHAIN = { range: 14, jumps: 4, dmg: 55 };
+DSP_SOUNDS.gun_maelstrom = [3, () => {
+  const D = DSP, sr = D.sr, out = D.buf(0.9);
+  const th = new Float32Array(Math.floor(sr * 0.25));                                       // deep thump
+  for (let i = 0; i < th.length; i++) { const x = i / sr; th[i] = Math.sin(2 * Math.PI * (110 - x * 220) * x) * Math.exp(-x / 0.05) * 0.9; }
+  D.mix(out, th, 0);
+  const zap = new Float32Array(Math.floor(sr * 0.32)); let ph = 0;                          // electric zap sweeping down
+  for (let i = 0; i < zap.length; i++) { const x = i / sr, f = 2600 * Math.exp(-x * 9) + 180; ph += 2 * Math.PI * f / sr; zap[i] = (Math.sign(Math.sin(ph)) * 0.35 + Math.sin(ph * 1.5) * 0.25) * Math.exp(-x / 0.09); }
+  D.mix(out, zap, 0.002);
+  const cr = D.noise(Math.floor(sr * 0.5), 1); let lp = 0;                                   // crackle tail (gated noise)
+  for (let i = 0; i < cr.length; i++) { const x = i / sr, gate = Math.random() < 0.08 ? 1 : 0.15; lp += (cr[i] - lp) * 0.5; cr[i] = lp * gate * Math.exp(-x / 0.12) * 0.9; }
+  D.mix(out, cr, 0.01);
+  const ck = D.noise(Math.floor(sr * 0.012), 1); D.envExp(ck, 0, 0.0004, 0.004); D.mix(out, ck, 0);   // crack
+  return D.normalize(out, 0.95);
+}];
+DSP_SOUNDS.far_maelstrom = [2, () => { const v = DSP_SOUNDS.gun_maelstrom[1](); let lp = 0; for (let i = 0; i < v.length; i++) { lp += (v[i] - lp) * 0.12; v[i] = lp * 0.8; } return v; }];
+
+// a jagged red lightning bolt between two points (short-lived)
+function stormArc(a, b, life = 0.2) {
+  const n = 9, P = new Float32Array(n * 3), d = b.clone().sub(a), L = d.length();
+  for (let i = 0; i < n; i++) { const t = i / (n - 1), j = (i === 0 || i === n - 1) ? 0 : L * 0.08; P[i * 3] = a.x + d.x * t + rand(-j, j); P[i * 3 + 1] = a.y + d.y * t + rand(-j, j); P[i * 3 + 2] = a.z + d.z * t + rand(-j, j); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  const mtl = new THREE.LineBasicMaterial({ color: 0xff5a6e, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }); mtl.color.multiplyScalar(2.5);
+  const line = new THREE.Line(geo, mtl); line.frustumCulled = false; Game.scene.add(line);
+  const t0 = now(); const tick = () => { const k = (now() - t0) / life; if (k >= 1 || Game.state !== 'playing') { Game.scene.remove(line); geo.dispose(); mtl.dispose(); return; } mtl.opacity = 1 - k; requestAnimationFrame(tick); }; requestAnimationFrame(tick);
+}
+function stormBurst(p) {
+  for (let k = 0; k < 10; k++) FX.spawn(FX.glows, 300, p, new THREE.Vector3(rand(-3, 3), rand(-1, 3), rand(-3, 3)), rand(0.25, 0.5), 0.05, k % 3 ? 0xff2e4d : 0xffd0d6, 4, 2);
+  FX.shock(p, 0xff2e4d, 0.25, 1.6);
+}
+// called from fireShot for weapons with chain: true
+function chainLightning(shooter, hits, W) {
+  for (const [victim, e] of hits) {
+    stormBurst(e.point);
+    const from = new THREE.Vector3((victim.renderPos || victim.pos).x, (victim.renderPos || victim.pos).y + 1.1, (victim.renderPos || victim.pos).z);
+    const near = Game.actors.filter(o => o !== shooter && o !== victim && o.alive && !sameTeam(o, shooter) && !hits.has(o))
+      .map(o => ({ o, c: new THREE.Vector3((o.renderPos || o.pos).x, (o.renderPos || o.pos).y + 1.1, (o.renderPos || o.pos).z) }))
+      .filter(x => x.c.distanceTo(from) < CHAIN.range && lineClear(from, x.c))
+      .sort((x, y) => x.c.distanceTo(from) - y.c.distanceTo(from)).slice(0, CHAIN.jumps);
+    for (const x of near) { stormArc(from, x.c); stormBurst(x.c); applyDamage(x.o, CHAIN.dmg, shooter, false, W.id, x.c); }
+    if (near.length && shooter && shooter.kind === 'local') Sound.play('hit', { vol: 0.5, rate: 1.4 });
+    // the storm feeds you: each target struck heals the shooter
+    if (W.lifesteal && shooter && shooter.alive) shooter.health = Math.min(100, shooter.health + W.lifesteal * (1 + near.length));
+  }
+}
+
+const MaelVM = {
+  update(ud, s, dt, firing) {
+    if (!ud.vortex) return;
+    const T = now();
+    if (ud.lastMag === undefined) ud.lastMag = s.mag;
+    if (s.mag < ud.lastMag) s.flare = 1;                                    // a shot was fired
+    if (s.reloadT <= 0 && ud.wasReloading) s.flare = 1.4;                   // reload finished: the storm surges
+    ud.wasReloading = s.reloadT > 0; ud.lastMag = s.mag;
+    s.flare = Math.max(0, (s.flare || 0) - dt * 3);
+    s.charge = damp(s.charge || 0, firing ? 1 : 0, firing ? 5 : 1.5, dt);
+    const f = s.flare, c = s.charge;
+    ud.vortex.rotation.z += dt * (2.5 + c * 16 + f * 10);
+    ud.rings.forEach((r, i) => { r.rotation.z += dt * (i % 2 ? -1 : 1) * (1.2 + c * 6 + i * 0.4); r.rotation.x = Math.sin(T * 1.3 + i) * 0.12; r.position.y = 0.035 + Math.sin(T * 2.4 + i * 1.7) * 0.004; r.scale.setScalar(1 + f * 0.12); });
+    const pulse = 0.75 + Math.sin(T * 4) * 0.25 + f * 0.8 + c * 0.4;
+    ud.glowMat.color.setRGB(2.2 * pulse, 0.3 * pulse, 0.45 * pulse);
+    ud.coreMat.color.setRGB(3 + f * 2, 2 + f * 1.5, 2.1 + f * 1.5);
+    ud.focus.scale.setScalar(1 + Math.sin(T * 9) * 0.12 + f * 0.8);
+    if (ud.halo) ud.halo.material.opacity = 0.6 + f * 0.4;
+    // crackling arcs between the prongs
+    if (ud.arcs) {
+      ud.arcT = (ud.arcT || 0) - dt;
+      if (ud.arcT <= 0) {
+        ud.arcT = 0.045;
+        ud.arcs.forEach(l => {
+          const P = l.geometry.attributes.position, z0 = rand(-0.66, -0.3);
+          for (let k = 0; k < 7; k++) { const t = k / 6; P.setXYZ(k, rand(-0.008, 0.008) * (k % 6 ? 1 : 0), 0.012 + t * 0.046 + (k % 6 ? rand(-0.006, 0.006) : 0), z0 + rand(-0.02, 0.02)); }
+          P.needsUpdate = true; l.material.opacity = Math.random() < 0.35 + c * 0.4 + f ? rand(0.6, 1) : 0;
+        });
+      }
+    }
+  },
+  // third person: keep the storm turning on other players' guns
+  model(m, a, dt) {
+    const ud = m.gun && m.gun.userData; if (!ud || !ud.vortex) return;
+    const firing = a.lastShotT && now() - a.lastShotT < 0.3;
+    ud.vortex.rotation.z += dt * (firing ? 14 : 3);
+    ud.rings.forEach((r, i) => { r.rotation.z += dt * (i % 2 ? -1 : 1) * (firing ? 6 : 1.4); });
+  },
+  // armory: red sparks orbiting the 3D preview
+  sparks(parent, on, dt) {
+    if (!this.sparkG) {
+      const g = this.sparkG = new THREE.Group(); this.sparkList = [];
+      const mt = new THREE.SpriteMaterial({ map: Tex.glow, color: 0xff2e4d, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false }); mt.color.multiplyScalar(2.2);
+      for (let k = 0; k < 40; k++) { const s = new THREE.Sprite(mt); s.userData = { a: rand(0, TAU), r: rand(0.25, 0.6), y: rand(-0.2, 0.2), sp: rand(0.4, 1.4), sz: rand(0.012, 0.035) }; g.add(s); this.sparkList.push(s); }
+    }
+    if (this.sparkG.parent !== parent) parent.add(this.sparkG);
+    this.sparkG.visible = on; if (!on) return;
+    const T = now();
+    for (const s of this.sparkList) { const u = s.userData; u.a += dt * u.sp; u.y += dt * 0.08; if (u.y > 0.25) u.y = -0.25; s.position.set(Math.cos(u.a) * u.r, u.y + Math.sin(T * 3 + u.a) * 0.02, Math.sin(u.a) * u.r * 0.6); s.scale.setScalar(u.sz * (0.7 + 0.3 * Math.sin(T * 8 + u.a))); }
+  }
+};
+
+/* ============================================================
    Networking
    Transport: the Claude artifact "room" capability (named rooms by code).
    Every player publishes their own state as presence (~20 Hz):
@@ -8848,7 +9099,7 @@ const Player = {
       limb(arms, V(0.015, -0.085, 0.07), V(0.04, -0.13, 0.15), 0.104, 0xfff4e0);
       // left arm (on handguard / pump)
       const left = new THREE.Group(); g.add(left);
-      const lz = { viper: 0.0, bazooka: -0.28, ar: -0.46, smg: -0.33, shotgun: -0.46, sniper: -0.52, burst: -0.43, lmg: -0.5, dmr: -0.53, pistol: 0.0, revolver: 0.0 }[id];
+      const lz = { maelstrom: -0.32, viper: 0.0, bazooka: -0.28, ar: -0.46, smg: -0.33, shotgun: -0.46, sniper: -0.52, burst: -0.43, lmg: -0.5, dmr: -0.53, pistol: 0.0, revolver: 0.0 }[id];
       if (id === 'jug' || id === 'bazooka') {
         // long reaches during these reloads: the arm is re-solved every frame from the shoulder to the hand
         const hand = id === 'jug' ? V(-0.035, -0.095, -0.31) : V(-0.005, -0.015, -0.28);
@@ -9106,6 +9357,8 @@ const Player = {
     root.visible = !scoped;
     if (s.id === 'jug') JugVM.update(ud, s, dt);
     if (s.id === 'bazooka') BazookaVM.update(ud, s, dt);
+    if (s.id === 'maelstrom') MaelVM.update(ud, s, dt, Input.lmb && s.mag > 0 && s.reloadT <= 0);
+    { const myth = s.id === 'maelstrom'; if (this.mythHud !== myth) { this.mythHud = myth; $('ammo').classList.toggle('mythic', myth); } }
     if (NadeThrow.animate(dt)) { root.visible = false; this.lowerT = 1; }
     const e = this.ads * this.ads * (3 - 2 * this.ads);
     const hip = new THREE.Vector3(0.19, s.id === 'bazooka' ? -0.22 : -0.2, s.id === 'bazooka' ? -0.62 : W.scope || s.id === 'dmr' ? -0.45 : -0.38), ads = new THREE.Vector3(0, -ud.sightY, { ar: -0.27, lmg: -0.29, smg: -0.24, jug: -0.3, bazooka: -0.5 }[s.id] || -0.3);
@@ -9362,11 +9615,19 @@ const Game = {
     this.clouds = new THREE.Group();
     const cm = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: col(0xd8e9ff), emissiveIntensity: 0.45 });
     const sg = new THREE.IcosahedronGeometry(1, 1);
-    for (let i = 0; i < 14; i++) {
-      const c = new THREE.Group(), a = i / 14 * TAU + rand(-0.2, 0.2), r = rand(230, 420);
-      c.position.set(Math.cos(a) * r, rand(70, 140), Math.sin(a) * r);
-      for (let k = 0; k < 6; k++) { const m = new THREE.Mesh(sg, cm); m.position.set(rand(-22, 22), rand(-3, 6), rand(-10, 10)); m.scale.set(rand(12, 22), rand(7, 12), rand(10, 16)); c.add(m); }
-      c.lookAt(0, c.position.y, 0); this.clouds.add(c);
+    { // 84 puffs merged into one mesh: same look, one draw call
+      const P = [], N = [], src = sg.index ? sg.toNonIndexed() : sg, sp = src.attributes.position, sn = src.attributes.normal, v = new THREE.Vector3(), nm = new THREE.Matrix3();
+      for (let i = 0; i < 14; i++) {
+        const c = new THREE.Object3D(), a = i / 14 * TAU + rand(-0.2, 0.2), r = rand(230, 420);
+        c.position.set(Math.cos(a) * r, rand(70, 140), Math.sin(a) * r); c.lookAt(0, c.position.y, 0); c.updateMatrix();
+        for (let k = 0; k < 6; k++) {
+          const m = new THREE.Object3D(); m.position.set(rand(-22, 22), rand(-3, 6), rand(-10, 10)); m.scale.set(rand(12, 22), rand(7, 12), rand(10, 16)); m.updateMatrix();
+          const M = new THREE.Matrix4().multiplyMatrices(c.matrix, m.matrix); nm.getNormalMatrix(M);
+          for (let j = 0; j < sp.count; j++) { v.fromBufferAttribute(sp, j).applyMatrix4(M); P.push(v.x, v.y, v.z); v.fromBufferAttribute(sn, j).applyMatrix3(nm).normalize(); N.push(v.x, v.y, v.z); }
+        }
+      }
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3));
+      const cl = new THREE.Mesh(geo, cm); cl.frustumCulled = false; this.clouds.add(cl);
     }
     s.add(this.clouds);
     // lighthouse lamp glow
@@ -9649,9 +9910,10 @@ const Game = {
       grenade: 'M32 6a8 8 0 018 8v2a8 8 0 01-16 0v-2a8 8 0 018-8zm-3-5h6v4h-6z',
       strike: 'M8 12l20-3 6-7h4l-3 7 14-1 4-4h3l-2 6 2 6h-3l-4-4-14-1 3 7h-4l-6-7-20-3z',
       minigun: 'M2 8h8l3-3h14v3h6l2 1h29v2H35v1h28v2H35v1h28v2H34l-2 1h-4l-1 7h-7l1-7H16l-4 5H6l3-5H2z',
-      rocket: 'M2 9h6l2-2h38l3-3h4l5 5-5 5h-4l-3-3H34l-2 2v7h-6v-7h-8l-2 6h-6l2-6H10l-2-2H2z'
+      rocket: 'M2 9h6l2-2h38l3-3h4l5 5-5 5h-4l-3-3H34l-2 2v7h-6v-7h-8l-2 6h-6l2-6H10l-2-2H2z',
+      storm: 'M2 10h8l2-3h24l2-3h6l-2 3h8l2 2h10v3H43l-2 2h-6l-2 7h-6l1-7H20l-4 7H8l3-7H2zM50 2l-6 8h5l-4 9 10-11h-5l4-6z'
     };
-    const k = { viper: 'pistol', bazooka: 'rocket', jug: 'minigun', ar: 'rifle', burst: 'rifle', lmg: 'rifle', dmr: 'sniper', smg: 'smg', shotgun: 'shotgun', sniper: 'sniper', pistol: 'pistol', revolver: 'revolver', grenade: 'grenade', nade: 'grenade', strike: 'strike', airstrike: 'strike' }[wid] || 'strike';
+    const k = { maelstrom: 'storm', viper: 'pistol', bazooka: 'rocket', jug: 'minigun', ar: 'rifle', burst: 'rifle', lmg: 'rifle', dmr: 'sniper', smg: 'smg', shotgun: 'shotgun', sniper: 'sniper', pistol: 'pistol', revolver: 'revolver', grenade: 'grenade', nade: 'grenade', strike: 'strike', airstrike: 'strike' }[wid] || 'strike';
     return `<svg class="wi" viewBox="0 0 64 24" role="img" aria-label="${esc(weaponName(wid))}"><title>${esc(weaponName(wid))}</title><path d="${P[k]}"/></svg>`;
   },
   feed(killer, victim, wid, head) {
@@ -9998,7 +10260,7 @@ function sanitizeProgress() {
   if (!PLAYER_COLORS[d.color]) d.color = 0;
 }
 function dropFocus() { const a = document.activeElement; if (a && a !== document.body && typeof a.blur === 'function') a.blur(); }
-const RARITY = { viper: { n: 'Legendary', c: '#ffb43c' }, bazooka: { n: 'Epic', c: '#b57bff' }, jug: { n: 'Legendary', c: '#ffb43c' }, ar: { n: 'Epic', c: '#b57bff' }, smg: { n: 'Rare', c: '#4aa8ff' }, shotgun: { n: 'Rare', c: '#4aa8ff' }, sniper: { n: 'Legendary', c: '#ffb43c' }, pistol: { n: 'Uncommon', c: '#5fd36b' }, burst: { n: 'Epic', c: '#b57bff' }, lmg: { n: 'Rare', c: '#4aa8ff' }, dmr: { n: 'Legendary', c: '#ffb43c' }, revolver: { n: 'Epic', c: '#b57bff' } };
+const RARITY = { maelstrom: { n: 'Mythical', c: '#ff2e4d' }, viper: { n: 'Legendary', c: '#ffb43c' }, bazooka: { n: 'Epic', c: '#b57bff' }, jug: { n: 'Legendary', c: '#ffb43c' }, ar: { n: 'Epic', c: '#b57bff' }, smg: { n: 'Rare', c: '#4aa8ff' }, shotgun: { n: 'Rare', c: '#4aa8ff' }, sniper: { n: 'Legendary', c: '#ffb43c' }, pistol: { n: 'Uncommon', c: '#5fd36b' }, burst: { n: 'Epic', c: '#b57bff' }, lmg: { n: 'Rare', c: '#4aa8ff' }, dmr: { n: 'Legendary', c: '#ffb43c' }, revolver: { n: 'Epic', c: '#b57bff' } };
 const UI = {
   h: {}, el: {},
   applyCrosshair() {
@@ -10069,6 +10331,7 @@ const UI = {
     w.visible = true;
     w.position.set(-Math.tan(28 * Math.PI / 180) * 1.3 * asp * 0.53, 0.27, -1.3);
     w.rotation.set(0.12 + Math.sin(t * 0.7) * 0.05, -Math.PI / 2 + Math.sin(t * 0.45) * 0.55, 0);
+    { const pg = w.userData.inner.children[0], myth = id === 'maelstrom'; MaelVM.sparks(w, myth, dt); if (myth && pg) MaelVM.update(pg.userData, this.maelS || (this.maelS = { mag: 40, reloadT: 0 }), dt, false); }
   }, medalQ: 0,
   medal(name) {
     const el = document.createElement('div'); el.className = 'medal'; el.innerHTML = `<i></i><b>${esc(name)}</b>`;
@@ -10112,7 +10375,7 @@ const UI = {
       const L = $(id);
       for (const w of PRIMARIES) {
         const W = WEAPONS[w], b = document.createElement('button'); b.className = 'wcard'; b.dataset.w = w;
-        const R = RARITY[w];
+        const R = RARITY[w]; if (R.n === 'Mythical') b.classList.add('mythic');
         b.innerHTML = `<span class="stripe" style="background:${R.c}"></span><em class="rar" style="color:${R.c}">${R.n}</em><b>${esc(W.name)}</b><span>${esc(W.blurb)}</span>`;
         b.onclick = () => { if (!weaponUnlocked(w)) { this.setErr(`${W.name} unlocks at level ${W.unlock}.`); return; } Settings.d.primary = w; Settings.save(); this.refreshMenu(); this.refreshPause(); Sound.ui(); };
         L.appendChild(b);
@@ -10186,8 +10449,11 @@ const UI = {
     $('opname').innerHTML = `${esc(cleanName(Settings.d.name) || 'Player')}<small>Level ${L.lv} · ${esc(WEAPONS[Settings.d.primary].name)}</small>`;
     { const W = WEAPONS[Settings.d.primary], st = [['Damage', Math.min(1, W.dmg * W.pellets / 110)], ['Fire rate', Math.min(1, 1 / W.interval / 15)], ['Range', Math.min(1, W.range[1] / 120)], ['Accuracy', Math.min(1, 1 - W.hip * 8)], ['Mobility', Math.min(1, W.speed / 1.08)], ['Handling', Math.min(1, 1 - W.adsTime / 0.36)]];
       const R = RARITY[Settings.d.primary] || { n: '', c: '#fff' };
+      $('armory').classList.toggle('mythic', R.n === 'Mythical'); $('menu').classList.toggle('mythic', R.n === 'Mythical');
       $('armory').innerHTML = `<div class="rar" style="color:${R.c}">${R.n} · ${W.auto ? 'Automatic' : W.burst ? 'Burst' : W.shellReload ? 'Pump action' : 'Semi-auto'}</div><h3>${esc(W.name)}</h3><p>${esc(W.blurb)}</p>
-        <div class="wstats">${st.map(([n, v]) => `<span>${n}</span><i><b style="width:${Math.round(clamp(v, 0.05, 1) * 100)}%"></b></i><em>${Math.round(clamp(v, 0.05, 1) * 100)}</em>`).join('')}</div>
+        <div class="wstats">${R.n === 'Mythical'
+          ? st.map(([n]) => `<span>${n}</span><i><b style="width:100%"></b></i><em>MAX</em>`).join('') + `<span>Chain lightning</span><i><b style="width:100%"></b></i><em>×${1 + CHAIN.jumps}</em><span>Lifesteal</span><i><b style="width:100%"></b></i><em>+${W.lifesteal}</em>`
+          : st.map(([n, v]) => `<span>${n}</span><i><b style="width:${Math.round(clamp(v, 0.05, 1) * 100)}%"></b></i><em>${Math.round(clamp(v, 0.05, 1) * 100)}</em>`).join('')}</div>
         <div class="meta"><div><b>${W.mag}</b><span>Magazine</span></div><div><b>${Math.round(60 / W.interval * (W.burst ? W.burst / 3 : 1))}</b><span>Fire rate rpm</span></div><div><b>${W.reload.toFixed(1)}s</b><span>Reload</span></div><div><b>${Camo.kills(Settings.d.primary)}</b><span>Eliminations</span></div></div>`; }
     { const items = [];
       for (const id in WEAPONS) if ((WEAPONS[id].unlock || 0) > L.lv) items.push([WEAPONS[id].unlock, WEAPONS[id].name]);
