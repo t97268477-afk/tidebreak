@@ -15,7 +15,8 @@ const MAX_PLAYERS = 8;
 // The game page can live in ./public/index.html or right next to this file (./index.html).
 const PUBLIC = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : null;
 const ROOT_INDEX = path.join(__dirname, 'index.html');
-const MAX_HIT = { ar: 60, smg: 40, shotgun: 215, sniper: 250, pistol: 70, grenade: 165 };
+const MAX_HIT = { ar: 60, smg: 40, shotgun: 215, sniper: 250, pistol: 70, grenade: 165, burst: 70, lmg: 50, dmr: 125, revolver: 135, jug: 40, bazooka: 220, viper: 125, maelstrom: 185, predator: 200, beast: 260, clarity: 220 };
+const SERVER_VERSION = '18.3';  // the game warns players when the server is older than it expects
 const MAX_DPS = 420;           // damage one player may deal per second, all targets combined
 const MAX_SPEED = 32;          // m/s, generous for jump pads + slides
 const MAX_RANGE = 270;         // metres between shooter and target
@@ -69,7 +70,7 @@ wss.on('connection', ws => {
       rooms.set(name, room); roomName = name;
       me = { id: 'p' + (nextId++).toString(36) + Math.random().toString(36).slice(2, 6), ws, p: null, window: [], dmgLog: [], lastHitSeq: 0, lastPos: null, lastPosT: 0, flags: 0 };
       room.set(me.id, me);
-      send(ws, { t: 'welcome', id: me.id, peers: [...room.values()].filter(o => o !== me).map(o => ({ id: o.id, p: o.p })) });
+      send(ws, { t: 'welcome', sv: SERVER_VERSION, id: me.id, peers: [...room.values()].filter(o => o !== me).map(o => ({ id: o.id, p: o.p })) });
       return;
     }
     if (m.t !== 'p' || !me || !m.p || typeof m.p !== 'object') return;
@@ -112,9 +113,10 @@ function sanitize(me, p, room, t) {
       me.lastHitSeq = h[0];
       const victim = room.get(h[1]);
       let ok = !!victim && victim !== me && !!(p.a);
-      ok = ok && h[2] >= 0 && h[2] <= (MAX_HIT[h[4]] || 60);
+      const known = Object.prototype.hasOwnProperty.call(MAX_HIT, h[4]);
+      ok = ok && h[2] >= 0 && h[2] <= (known ? MAX_HIT[h[4]] : 250);   // a weapon newer than this server gets a generous cap instead of being rejected
       const dmgSoFar = me.dmgLog.reduce((n, x) => n + x.d, 0);
-      ok = ok && dmgSoFar + h[2] <= MAX_DPS;
+      ok = ok && (h[4] === 'grenade' || h[4] === 'bazooka' || h[4] === 'maelstrom' || h[4] === 'predator' || h[4] === 'beast' || h[4] === 'clarity' || dmgSoFar + h[2] <= (known ? MAX_DPS : MAX_DPS * 3));   // explosions are capped per hit instead
       if (ok && victim.p && Array.isArray(victim.p.p) && me.lastPos) {
         const vp = victim.p.p, d = Math.hypot(vp[0] - me.lastPos[0], vp[1] - me.lastPos[1], vp[2] - me.lastPos[2]);
         ok = d <= (h[4] === 'grenade' ? 40 : MAX_RANGE);
