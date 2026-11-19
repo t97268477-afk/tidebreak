@@ -15,8 +15,8 @@ const MAX_PLAYERS = 8;
 // The game page can live in ./public/index.html or right next to this file (./index.html).
 const PUBLIC = fs.existsSync(path.join(__dirname, 'public', 'index.html')) ? path.join(__dirname, 'public') : null;
 const ROOT_INDEX = path.join(__dirname, 'index.html');
-const MAX_HIT = { ar: 60, smg: 40, shotgun: 215, sniper: 250, pistol: 70, grenade: 165, burst: 70, lmg: 50, dmr: 125, revolver: 135, jug: 40, bazooka: 220, viper: 125, maelstrom: 185, predator: 200, beast: 260, clarity: 220, twin: 150 };
-const SERVER_VERSION = '19.9';  // the game warns players when the server is older than it expects
+const MAX_HIT = { ar: 60, smg: 40, shotgun: 215, sniper: 250, pistol: 70, grenade: 165, burst: 70, lmg: 50, dmr: 125, revolver: 135, jug: 40, bazooka: 220, viper: 125, maelstrom: 185, predator: 200, beast: 260, clarity: 220, twin: 150, annihilator: 200 };
+const SERVER_VERSION = '21.1';  // the game warns players when the server is older than it expects
 const MAX_DPS = 420;           // damage one player may deal per second, all targets combined
 const MAX_SPEED = 48;          // m/s, generous for jump pads, slides and grapple flights
 const MAX_RANGE = 270;         // metres between shooter and target
@@ -116,7 +116,7 @@ function sanitize(me, p, room, t) {
       const known = Object.prototype.hasOwnProperty.call(MAX_HIT, h[4]);
       ok = ok && h[2] >= 0 && h[2] <= (known ? MAX_HIT[h[4]] : 250);   // a weapon newer than this server gets a generous cap instead of being rejected
       const dmgSoFar = me.dmgLog.reduce((n, x) => n + x.d, 0);
-      ok = ok && (h[4] === 'grenade' || h[4] === 'bazooka' || h[4] === 'maelstrom' || h[4] === 'predator' || h[4] === 'beast' || h[4] === 'clarity' || h[4] === 'twin' || dmgSoFar + h[2] <= (known ? MAX_DPS : MAX_DPS * 3));   // explosions are capped per hit instead
+      ok = ok && (h[4] === 'grenade' || h[4] === 'bazooka' || h[4] === 'maelstrom' || h[4] === 'predator' || h[4] === 'beast' || h[4] === 'clarity' || h[4] === 'twin' || h[4] === 'annihilator' || dmgSoFar + h[2] <= (known ? MAX_DPS : MAX_DPS * 3));   // explosions are capped per hit instead
       if (ok && victim.p && Array.isArray(victim.p.p) && me.lastPos) {
         const vp = victim.p.p, d = Math.hypot(vp[0] - me.lastPos[0], vp[1] - me.lastPos[1], vp[2] - me.lastPos[2]);
         ok = d <= (h[4] === 'grenade' ? 40 : MAX_RANGE);
